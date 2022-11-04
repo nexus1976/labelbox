@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "labelbox": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5227",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CorsAttribute_Headers": "*",
+        "CorsAttribute_Methods": "*",
+        "CorsAttribute_Origins": "*",
+        "AllowedHosts": "*"
+      }
+    }
+  }
+}
