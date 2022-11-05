@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  labelbox:
+    image: labelbox
+    container_name: labelbox
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # ports:
+    #   - "5888:80"
+    network_mode: host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CorsAttribute_Headers=*
+      - CorsAttribute_Methods=*
+      - CorsAttribute_Origins=*
+      - AllowedHosts=*
+
+volumes:
+  labelbox-diskio:
