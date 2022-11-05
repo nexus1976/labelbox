@@ -2,11 +2,21 @@
 using labelbox.Models;
 using SkiaSharp;
 using System.Text.Json;
+using System.IO.Abstractions;
 
 namespace labelbox.Services
 {
     public class AssetService : IAssetService
     {
+        private readonly IFileSystem _fileSystem;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public AssetService(IFileSystem fileSystem, IHttpClientFactory httpClientFactory)
+        {
+            _fileSystem = fileSystem;
+            _httpClientFactory = httpClientFactory;
+        }
+
         public Asset ValidateURLs(Asset asset)
         {
             if (asset != null)
@@ -35,7 +45,6 @@ namespace labelbox.Services
             if (asset != null)
             {
                 PipelineStatusEnum state = PipelineStatusEnum.Started;
-                using HttpClient httpClient = new();
                 var status = new PipelineStatusModel()
                 {
                     Id = asset.Id.ToString(),
@@ -51,6 +60,7 @@ namespace labelbox.Services
                 bool postSuccess = true;
                 try
                 {
+                    using var httpClient = _httpClientFactory.CreateClient();
                     using var response = await httpClient.PostAsync(asset.OnStartURL, httpContent, cancellationToken);
                     postSuccess = response.IsSuccessStatusCode;
                 }
@@ -77,7 +87,6 @@ namespace labelbox.Services
             if (asset != null)
             {
                 PipelineStatusEnum state = PipelineStatusEnum.Success;
-                using HttpClient httpClient = new();
                 var status = new PipelineStatusModel()
                 {
                     Id = asset.Id.ToString(),
@@ -93,6 +102,7 @@ namespace labelbox.Services
                 bool postSuccess = true;
                 try
                 {
+                    using var httpClient = _httpClientFactory.CreateClient();
                     using var response = await httpClient.PostAsync(asset.OnSuccessURL, httpContent, cancellationToken);
                     postSuccess = response.IsSuccessStatusCode;
                 }
@@ -119,7 +129,6 @@ namespace labelbox.Services
             if (asset != null)
             {
                 PipelineStatusEnum state = PipelineStatusEnum.Failed;
-                using HttpClient httpClient = new();
                 var status = new PipelineStatusWithErrorsModel()
                 {
                     Id = asset.Id.ToString(),
@@ -136,6 +145,7 @@ namespace labelbox.Services
                 bool postSuccess = true;
                 try
                 {
+                    using var httpClient = _httpClientFactory.CreateClient();
                     using var response = await httpClient.PostAsync(asset.OnFailureURL, httpContent, cancellationToken);
                     postSuccess = response.IsSuccessStatusCode;
                 }
@@ -173,6 +183,7 @@ namespace labelbox.Services
             }
             return errors;
         }
+        
         public string ConvertEnumToString(PipelineStatusEnum pipelineStatusEnum)
         {
             return pipelineStatusEnum switch
@@ -191,9 +202,9 @@ namespace labelbox.Services
         {
             try
             {
-                if (File.Exists(asset.Path))
+                if (_fileSystem.File.Exists(asset.Path))
                 {
-                    var fileBytes = File.ReadAllBytes(asset.Path);
+                    var fileBytes = _fileSystem.File.ReadAllBytes(asset.Path);
                     if (IsJPG(fileBytes))
                     {
                         using MemoryStream memoryStream = new(fileBytes);

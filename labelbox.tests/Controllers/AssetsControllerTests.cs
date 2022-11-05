@@ -15,7 +15,6 @@ namespace labelbox.tests.Controllers
         private readonly Mock<IExposedQueue> _exposedQueueMock;
         private readonly Mock<IAssetService> _assetServiceMock;
         private readonly IDataContext _dataContext;
-
         private readonly FakeGuidQueue _fakeGuidQueue;
 
         public AssetsControllerTests()

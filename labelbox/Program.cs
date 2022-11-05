@@ -1,5 +1,6 @@
 using labelbox.Data;
 using labelbox.Services;
+using System.IO.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,9 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 }));
 builder.Services.AddHealthChecks().AddDbContextCheck<DataContext>();
 builder.Services.AddDbContext<DataContext>();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IDataContext, DataContext>();
+builder.Services.AddScoped<IFileSystem, FileSystem>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddSingleton<WorkerService>();
 builder.Services.AddSingleton<IExposedQueue, WorkerService>(provider => provider.GetRequiredService<WorkerService>());
