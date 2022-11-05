@@ -33,7 +33,7 @@ namespace labelbox.Controllers
             try
             {
                 if (model == null || !model.IsValid())
-                    return await Task.FromResult(BadRequest());
+                    return BadRequest();
 
                 Asset asset = new()
                 {
@@ -46,7 +46,7 @@ namespace labelbox.Controllers
                 };
                 _dataContext.Assets.Add(asset);
                 await _dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                _exposedQueue.Queue.Add(asset.Id, cancellationToken);
+                _exposedQueue.Enqueue(asset.Id, cancellationToken);
                 PipelineStatusModel response = new()
                 {
                     Id = asset.Id.ToString(),

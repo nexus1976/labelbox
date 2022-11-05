@@ -1,6 +1,5 @@
 using labelbox.Data;
 using labelbox.Services;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +11,7 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
     builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
+builder.Services.AddHealthChecks().AddDbContextCheck<DataContext>();
 builder.Services.AddDbContext<DataContext>();
 builder.Services.AddScoped<IDataContext, DataContext>();
 builder.Services.AddScoped<IAssetService, AssetService>();
@@ -30,5 +30,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("corsapp");
 app.UseAuthorization();
+app.UseHealthChecks("/healthz");
 app.MapControllers();
 app.Run();

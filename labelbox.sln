@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "labelbox", "labelbox.csproj", "{BC130781-8DBB-470D-B240-08E01153696B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "labelbox", "labelbox\labelbox.csproj", "{BC130781-8DBB-470D-B240-08E01153696B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "labelbox.tests", "labelbox.tests\labelbox.tests.csproj", "{324FEEB4-E5CF-48A1-81D9-B10401FCA6D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BC130781-8DBB-470D-B240-08E01153696B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC130781-8DBB-470D-B240-08E01153696B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC130781-8DBB-470D-B240-08E01153696B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{324FEEB4-E5CF-48A1-81D9-B10401FCA6D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324FEEB4-E5CF-48A1-81D9-B10401FCA6D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{324FEEB4-E5CF-48A1-81D9-B10401FCA6D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{324FEEB4-E5CF-48A1-81D9-B10401FCA6D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

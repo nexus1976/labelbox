@@ -13,6 +13,10 @@ namespace labelbox.Services
         private readonly IServiceScopeFactory _factory;
 
         public BlockingCollection<Guid> Queue { get { return _queue; } }
+        public void Enqueue(Guid item, CancellationToken cancellationToken)
+        {
+            _queue.Add(item, cancellationToken);
+        }
 
         public WorkerService(ILogger<WorkerService> logger, IServiceScopeFactory factory)
         {

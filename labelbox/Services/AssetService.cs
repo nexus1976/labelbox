@@ -1,8 +1,6 @@
 ﻿using labelbox.Data;
 using labelbox.Models;
 using SkiaSharp;
-using System.Drawing;
-using System.Dynamic;
 using System.Text.Json;
 
 namespace labelbox.Services
