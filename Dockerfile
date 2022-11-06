@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-EXPOSE 5888
+EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 as build-env
 WORKDIR /src
@@ -13,14 +13,10 @@ COPY . .
 WORKDIR /src/labelbox
 RUN dotnet build -c Release -o /app
 
-# WORKDIR /src/labelbox.tests
-# RUN dotnet build -c Release -o /app
-
 FROM build-env AS publish
 RUN dotnet publish "labelbox.csproj" -c Release -o /app/publish
 
 FROM base as final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# ENTRYPOINT ["dotnet", "labelbox.dll"]
-ENTRYPOINT ["dotnet", "labelbox.dll", "--urls=http://0.0.0.0:5888"]
+ENTRYPOINT ["dotnet", "labelbox.dll"]

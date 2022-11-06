@@ -1,6 +1,5 @@
 ﻿using labelbox.Data;
 using labelbox.Models;
-using SkiaSharp;
 using System.Text.Json;
 using System.IO.Abstractions;
 
@@ -207,9 +206,8 @@ namespace labelbox.Services
                     var fileBytes = _fileSystem.File.ReadAllBytes(asset.Path);
                     if (IsJPG(fileBytes))
                     {
-                        using MemoryStream memoryStream = new(fileBytes);
-                        using SKBitmap bitmap = SKBitmap.Decode(memoryStream);
-                        if (bitmap.Height <= 1000 || bitmap.Width <= 1000)
+                        var bitmap = GetJPGSize(fileBytes);
+                        if (bitmap.height <= 1000 || bitmap.width <= 1000)
                         {
                             asset.State = PipelineStatusEnum.Failed;
                             asset.AssetValidationError = "jpeg does not have a width and/or height greater than 1000px";
@@ -235,6 +233,48 @@ namespace labelbox.Services
             return await Task.FromResult(asset);
         }
 
+        private static (ushort height, ushort width) GetJPGSize(byte[] imageBytes)
+        {
+            ushort height = 0;
+            ushort width = 0;
+            for (int i = 0; i < imageBytes.Length; i++)
+            {
+                if (imageBytes[i] == 0xFF)
+                {
+                    i++;
+                    if (i < imageBytes.Length)
+                    {
+                        /*
+                            0xFF, 0xC0,             // SOF0 segement
+                            0x00, 0x11,             // length of segment depends on the number of components
+                            0x08,                   // bits per pixel
+                            0x00, 0x95,             // image height
+                            0x00, 0xE3,             // image width
+                            0x03,                   // number of components (should be 1 or 3)
+                            0x01, 0x22, 0x00,       // 0x01=Y component, 0x22=sampling factor, quantization table number
+                            0x02, 0x11, 0x01,       // 0x02=Cb component, ...
+                            0x03, 0x11, 0x01        // 0x03=Cr component, ...
+                        */
+                        if (imageBytes[i] == 0xC0) // Start Of Frame (baseline DCT)
+                        {
+                            i += 4;
+                            if (i < imageBytes.Length - 1)
+                            {
+                                // 2 bytes for height
+                                height = BitConverter.ToUInt16(new byte[2] { imageBytes[++i], imageBytes[i - 1] }, 0);
+                            }
+                            i++;
+                            if (i < imageBytes.Length - 1)
+                            {
+                                // 2 bytes for width
+                                width = BitConverter.ToUInt16(new byte[2] { imageBytes[++i], imageBytes[i - 1] }, 0);
+                            }
+                        }
+                    }
+                }
+            }
+            return (height, width);
+        }
         private static bool IsJPG(byte[] fileBytes)
         {
             var jpeg = new byte[] { 255, 216, 255, 224 }; // jpeg

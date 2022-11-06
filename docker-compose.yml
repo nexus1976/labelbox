@@ -7,15 +7,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # ports:
-    #   - "5888:80"
-    network_mode: host
+    ports:
+      - "5888:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - CorsAttribute_Headers=*
       - CorsAttribute_Methods=*
       - CorsAttribute_Origins=*
       - AllowedHosts=*
-
-volumes:
-  labelbox-diskio:
+    volumes:
+      - type: bind
+        source: ./images
+        target: /images
+  labelbox-tests:
+    image: labelbox-tests
+    container_name: labelbox-tests
+    build:
+      context: .
+      dockerfile: Tests.Dockerfile

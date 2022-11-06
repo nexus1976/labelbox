@@ -1,5 +1,4 @@
-﻿using labelbox.Controllers;
-using labelbox.Data;
+﻿using labelbox.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 
