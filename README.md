@@ -6,7 +6,8 @@ This assessment presumes that local port `5888` is free / available.
 After cloning this git repo locally, you may issue any of the following commands in the root of this local repo's directory:
 - `make test-e2e`  *this will run all the unit tests* 
 - `make test TESTFILTER={testfilter}`  *this will run all of the tests with test names matching the given {testfilter} parameter (e.g., `make test TESTFILTER=WhenCalling_PostAsset_Returns500`)* 
-- `make server`  *this will simply instantiate the microservice which will make the service available at `http://localhost:5888`*
+- `make server`  *this will simply instantiate the microservice which will make the service available at `http://localhost:5888`*  
+You can also observe an OpenAPI spec at `http://localhost:5888/swagger/index.html`
 
 The assessment didn't require the provision for the webhooks themselves. Given this, it's worth noting that for any microservice calls to be successful, the webhooks specified in the `/assets/image` payload will need to be reachable by the microservice, which is to say that they will need to be reachable to the Docker container. Since the container doesn't specify any special network settings, if another local service is to be used, it should be in a Docker container accessible to the same default/bridge Docker network and accessed via the Docker service name. 
 
@@ -89,6 +90,9 @@ The following are the list of the available unit test names:
 - WhenCalling_ValidateURLs_BadOnFailureURL
 - WhenCalling_ValidateURLs_BadOnStartURL
 - WhenCalling_ValidateURLs_BadOnSuccessURL
+- WhenCalling_Dequeue
+- WhenCalling_Enqueue
+- WhenCalling_ProcessMessageAsync_OneItem
 
 You can run all unit tests by issuing a `make test-e2e` command in root of this local repo's directory.
 
