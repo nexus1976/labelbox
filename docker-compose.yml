@@ -25,3 +25,8 @@ services:
     build:
       context: .
       dockerfile: Tests.Dockerfile
+networks:
+  default:
+    name: labelbox-net
+    driver: bridge
+    
