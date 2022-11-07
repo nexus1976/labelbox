@@ -18,8 +18,9 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IDataContext, DataContext>();
 builder.Services.AddScoped<IFileSystem, FileSystem>();
 builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddSingleton<IExposedQueue, ExposedQueue>();
+builder.Services.AddScoped<IQueueProcessor, QueueProcessor>();
 builder.Services.AddSingleton<WorkerService>();
-builder.Services.AddSingleton<IExposedQueue, WorkerService>(provider => provider.GetRequiredService<WorkerService>());
 builder.Services.AddHostedService(provider => provider.GetRequiredService<WorkerService>());
 
 var app = builder.Build();

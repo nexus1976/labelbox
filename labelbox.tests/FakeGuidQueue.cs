@@ -11,5 +11,19 @@
         {
             _list.Add(item);
         }
+        public virtual bool Any()
+        {
+            return _list.Any();
+        }
+        public virtual Guid Remove(CancellationToken cancellation)
+        {
+            Guid item = Guid.Empty;
+            if (_list.Any())
+            {
+                item = _list.First();
+                _list.Remove(item);
+            }
+            return item;
+        }
     }
 }

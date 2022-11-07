@@ -1,27 +1,15 @@
-﻿using labelbox.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
-
-namespace labelbox.Services
+﻿namespace labelbox.Services
 {
-    public class WorkerService : BackgroundService, IExposedQueue
+    public class WorkerService : BackgroundService
     {
         private const int queuePollTime = 2000; // 2 seconds
-        private readonly BlockingCollection<Guid> _queue;
         private readonly ILogger<WorkerService> _logger;
         private readonly IServiceScopeFactory _factory;
-
-        public BlockingCollection<Guid> Queue { get { return _queue; } }
-        public void Enqueue(Guid item, CancellationToken cancellationToken)
-        {
-            _queue.Add(item, cancellationToken);
-        }
 
         public WorkerService(ILogger<WorkerService> logger, IServiceScopeFactory factory)
         {
             _logger = logger;
             _factory = factory;
-            _queue = new BlockingCollection<Guid>();
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -31,10 +19,9 @@ namespace labelbox.Services
                 try
                 {
                     await using AsyncServiceScope asyncScope = _factory.CreateAsyncScope();
-                    IDataContext dataContext = asyncScope.ServiceProvider.GetRequiredService<IDataContext>();
-                    IAssetService assetService = asyncScope.ServiceProvider.GetRequiredService<IAssetService>();
+                    IQueueProcessor queueProcessor = asyncScope.ServiceProvider.GetRequiredService<IQueueProcessor>();
+                    await queueProcessor.ProcessMessageAsync(stoppingToken);
                     await Task.Delay(queuePollTime, stoppingToken);
-                    await DoQueuedWorkAsync(dataContext, assetService, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -42,51 +29,6 @@ namespace labelbox.Services
                 }
             }
             _logger.LogDebug("Exiting ExecuteAsync");
-        }
-
-        private async Task DoQueuedWorkAsync(IDataContext dataContext, IAssetService assetService, CancellationToken cancellationToken)
-        {
-            if (_queue != null)
-            {
-                bool queueProcessing = true;
-                while (queueProcessing)
-                {
-                    var assetId = _queue.Take(cancellationToken);
-                    var asset = await dataContext.Assets.FirstOrDefaultAsync(a => a.Id == assetId, cancellationToken).ConfigureAwait(false);
-                    if (asset != null)
-                    {
-                        asset = assetService.ValidateURLs(asset);
-                        await dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-                        if (asset.State != Models.PipelineStatusEnum.Failed)
-                        {
-                            _ = await assetService.TrySendStartedEventAsync(asset, cancellationToken);
-                            await dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                            if (asset.State != Models.PipelineStatusEnum.Failed)
-                            {
-                                _ = await assetService.ValidateJPEG(asset, cancellationToken);
-                                await dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                                if (asset.State != Models.PipelineStatusEnum.Failed)
-                                {
-                                    _ = await assetService.TrySendSuccessEventAsync(asset, cancellationToken);
-                                    await dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                                }
-                            }
-                        }
-
-                        if (asset.State == Models.PipelineStatusEnum.Failed)
-                        {
-                            _ = await assetService.TrySendFailureEventAsync(asset, cancellationToken);
-                            await dataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                        }
-                    }
-                    else
-                    {
-                        queueProcessing = false;
-                    }
-                }
-            }
-            return;
         }
     }
 }
