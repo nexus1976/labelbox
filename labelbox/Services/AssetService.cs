@@ -207,7 +207,11 @@ namespace labelbox.Services
                     if (IsJPG(fileBytes))
                     {
                         var (height, width) = GetJPGSize(fileBytes);
-                        if (height <= 1000 || width <= 1000)
+                        if (height <= 0 || width <= 0)
+                        {
+                            asset.State = PipelineStatusEnum.Failed;
+                            asset.AssetValidationError = "is not a jpeg";
+                        } else if (height <= 1000 || width <= 1000)
                         {
                             asset.State = PipelineStatusEnum.Failed;
                             asset.AssetValidationError = "jpeg does not have a width and/or height greater than 1000px";

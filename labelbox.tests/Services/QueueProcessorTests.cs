@@ -1,6 +1,7 @@
 ﻿using labelbox.Data;
 using labelbox.Models;
 using labelbox.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace labelbox.tests.Services
 {
@@ -15,7 +16,9 @@ namespace labelbox.tests.Services
 
         public QueueProcessorTests()
         {
-            _dataContext = new DataContext();
+            var options = new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(databaseName: "LabelboxTestDb_QueueProcessor").Options;
+
+            _dataContext = new DataContext(options);
             _fakeGuidQueue = new();
             _assetServiceMock = new Mock<IAssetService>();
             _exposedQueue = new ExposedQueue();

@@ -1,6 +1,7 @@
 using labelbox.Data;
 using labelbox.Services;
 using System.IO.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,8 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
     builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
+builder.Services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase(databaseName: "LabelboxDb"));
 builder.Services.AddHealthChecks().AddDbContextCheck<DataContext>();
-builder.Services.AddDbContext<DataContext>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IDataContext, DataContext>();
 builder.Services.AddScoped<IFileSystem, FileSystem>();

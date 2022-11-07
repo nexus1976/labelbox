@@ -22,7 +22,8 @@ namespace labelbox.tests.Controllers
             _loggerMock = new Mock<ILogger<AssetsController>>();
             _exposedQueueMock = new Mock<IExposedQueue>();
             _assetServiceMock = new Mock<IAssetService>();
-            _dataContext = new DataContext();
+            var options = new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(databaseName: "LabelboxTestDb_AssetsController").Options;
+            _dataContext = new DataContext(options);
             _fakeGuidQueue = new();
             _exposedQueueMock.Setup(x => x.Enqueue(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Callback(_fakeGuidQueue.Add);
 

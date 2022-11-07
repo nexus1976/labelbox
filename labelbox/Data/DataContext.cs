@@ -5,13 +5,10 @@ namespace labelbox.Data
     public class DataContext : DbContext, IDataContext
     {
         public DataContext() { }
+        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<Asset> Assets { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseInMemoryDatabase(databaseName: "LabelboxDb");
-        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Asset>(entity =>
