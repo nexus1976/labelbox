@@ -16,10 +16,11 @@ server:
 .PHONY: test-e2e
 test-e2e:
 	$(info Make: Running all unit tests)
+	@docker compose up -d
 	@docker exec -it labelbox-tests dotnet test
 
 .PHONY: test
 test:
 	$(info Make: Running tests matching test name $(TESTFILTER))
-	@make -s start
+	@docker compose up -d
 	@docker exec -it labelbox-tests dotnet test --filter $(TESTFILTER)

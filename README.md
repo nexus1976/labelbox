@@ -14,7 +14,7 @@ The assessment didn't require the provision for the webhooks themselves. Given t
 For local testing, while I didn't include it in this assessment, I nevertheless created a webhooks project to receive the webhook calls which is located at this
 git repo: https://github.com/nexus1976/labelbox-webhooks . If using this project for testing the webhooks, please initiate it by running a `docker compose up` in the repo's root folder. This project assumes that local port `3030` is free / available.
 
-Since the microservice is also performing local file io, it's worth noting that in the `labelbox` subfolder of this repo, there is a subfolder called `images`. This folder is mounted to the microservice container to the path `/images`. You'll note that I've seeded 3 image files in there already for testing, however for any additional image files you wish to test with, please copy them into this folder on your host before attempting to reference them in the `/assets/image` payload.
+Since the microservice is also performing local file io, it's worth noting that in the root of this repo, there is a subfolder called `images`. This folder is mounted to the microservice container to the path `/images`. You'll note that I've seeded 3 image files in there already for testing, however for any additional image files you wish to test with, please copy them into this folder on your host before attempting to reference them in the `/assets/image` payload.
 
 The following would be an example payload to the `assets/image` endpoint if using the `labelbox-webhooks` from above (presuming a `curl --request POST 'http://localhost:5888/assets/image' --header 'Content-Type: application/json'` the following would go into the `--data-raw` string value):
 ```json
